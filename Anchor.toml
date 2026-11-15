@@ -3,13 +3,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-agentx = "AgXPRoToCoLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+agentx = "7cnrBzeFJVWR54PXadfDzE9ZWy975TaCTfBTGVL5wi5K"
 
 [programs.devnet]
-agentx = "AgXPRoToCoLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+agentx = "7cnrBzeFJVWR54PXadfDzE9ZWy975TaCTfBTGVL5wi5K"
 
 [programs.mainnet]
-agentx = "AgXPRoToCoLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+agentx = "7cnrBzeFJVWR54PXadfDzE9ZWy975TaCTfBTGVL5wi5K"
 
 [registry]
 url = "https://api.apr.dev"

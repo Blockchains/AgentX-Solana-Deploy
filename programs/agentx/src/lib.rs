@@ -9,7 +9,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
-declare_id!("AgXPRoToCoLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+declare_id!("7cnrBzeFJVWR54PXadfDzE9ZWy975TaCTfBTGVL5wi5K");
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -140,6 +140,28 @@ pub struct TaskAccount {
 // Instruction contexts
 // ---------------------------------------------------------------------------
 
+/// One-time lab/admin setup: create the registry PDA that register_agent requires.
+/// Upstream ships no initialize instruction; this is a Sol.College demonstration patch.
+#[derive(Accounts)]
+pub struct InitializeRegistry<'info> {
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + 32 + 8 + 8 + 32 + 1,
+        seeds = [b"registry"],
+        bump
+    )]
+    pub registry: Account<'info, RegistryAccount>,
+
+    /// CHECK: AGX mint is recorded for later claim_reward; not validated beyond being a pubkey.
+    pub agx_mint: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
 #[derive(Accounts)]
 #[instruction(agent_id: [u8; 8], name: String, model: String)]
 pub struct RegisterAgent<'info> {
@@ -263,6 +285,20 @@ pub struct DeactivateAgent<'info> {
 #[program]
 pub mod agentx {
     use super::*;
+
+    /// Initialise the global registry PDA (seeds ["registry"]).
+    /// Lab patch: upstream has no initialize instruction, but every other
+    /// instruction requires this account to already exist.
+    pub fn initialize_registry(ctx: Context<InitializeRegistry>) -> Result<()> {
+        let registry = &mut ctx.accounts.registry;
+        registry.authority = ctx.accounts.authority.key();
+        registry.total_agents = 0;
+        registry.total_tasks = 0;
+        registry.agx_mint = ctx.accounts.agx_mint.key();
+        registry.registration_paused = false;
+        msg!("AgentX: registry initialised, authority={}", registry.authority);
+        Ok(())
+    }
 
     /// Register a new AI agent on-chain.
     ///
